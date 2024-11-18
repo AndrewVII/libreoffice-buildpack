@@ -1,14 +1,4 @@
-#!/bin/bash
-
-BUILD_DIR=$1
-CACHE_DIR=$2
-
-echo "-----> Installing LibreOffice"
-
-# Add LibreOffice dependencies
-apt-get update
-apt-get install -y libreoffice
-apt-get install -y wget
-apt-get clean
-
-echo "-----> LibreOffice installation complete"
+   # custom-buildpack/bin/compile
+   #!/bin/bash
+   echo "Setting LD_LIBRARY_PATH"
+   echo "export LD_LIBRARY_PATH=\"/usr/lib/libreoffice/program:\$LD_LIBRARY_PATH\"" >> $BUILD_DIR/.profile.d/set_ld_library_path.sh
