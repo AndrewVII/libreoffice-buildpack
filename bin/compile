@@ -1,11 +1,11 @@
    # custom-buildpack/bin/compile
    #!/bin/bash
 
-   # Check if BUILD_DIR is set
-   if [ -z "$BUILD_DIR" ]; then
-     echo "Error: BUILD_DIR is not set."
-     exit 1
-   fi
+
+   BUILD_DIR=$1
+   CACHE_DIR=$2
+
+   # Set a default BUILD_DIR if not set (for debugging purposes)
 
    # Ensure the .profile.d directory exists
    mkdir -p "$BUILD_DIR/.profile.d"
