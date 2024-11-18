@@ -1,62 +1,14 @@
-#!/usr/bin/env bash
-
-set -e
-set -x  # Enable debugging
+#!/bin/bash
 
 BUILD_DIR=$1
 CACHE_DIR=$2
 
-# config
-VERSION="24.8.3"
-MINOR_VERSION="24.8"
+echo "-----> Installing LibreOffice"
 
-# LibreOffice Binaries URL
-FILE_NAME=LibreOffice_${VERSION}_Linux_x86-64_deb.tar.gz
-BUILDPACK_LIBREOFFICE_PACKAGE=https://download.documentfoundation.org/libreoffice/stable/${VERSION}/deb/x86_64/${FILE_NAME}
-ARCHIVE_NAME=libreoffice_${VERSION}
+# Add LibreOffice dependencies
+apt-get update
+apt-get install -y libreoffice
+apt-get install -y wget
+apt-get clean
 
-# Create cache directory if it doesn't exist
-mkdir -p "$CACHE_DIR"
-
-# Download LibreOffice binaries if they do not exist in the cache
-if ! [ -e "$CACHE_DIR/$FILE_NAME" ]; then
-  echo "-----> LibreOffice: Downloading LibreOffice ${VERSION} binaries from ${BUILDPACK_LIBREOFFICE_PACKAGE}"
-  curl -L "$BUILDPACK_LIBREOFFICE_PACKAGE" -o "$CACHE_DIR/$FILE_NAME"
-fi
-
-# Create necessary directories in the build path
-echo "-----> LibreOffice: Extracting LibreOffice ${VERSION} binaries to ${BUILD_DIR}/vendor/libreoffice"
-mkdir -p "$BUILD_DIR/vendor/libreoffice"
-
-# Extract LibreOffice binaries to vendor/libreoffice
-tar xzf "$CACHE_DIR/$FILE_NAME" -C "$BUILD_DIR/vendor/libreoffice/"
-
-# Find the extracted directory
-LIBREOFFICE_EXTRACTED_DIR=$(find "$BUILD_DIR/vendor/libreoffice/" -maxdepth 1 -type d -name 'LibreOffice_*')
-if [ -z "$LIBREOFFICE_EXTRACTED_DIR" ]; then
-  echo "Error: LibreOffice extraction directory not found."
-  exit 1
-fi
-
-# Move the DEBS directory contents to the vendor directory
-mv "$LIBREOFFICE_EXTRACTED_DIR"/DEBS/* "$BUILD_DIR/vendor/libreoffice"
-
-# Extract the .deb files manually
-for deb in "$BUILD_DIR/vendor/libreoffice"/*.deb; do
-  dpkg-deb -x "$deb" "$BUILD_DIR/vendor/libreoffice"
-done
-
-# Verify the contents of the vendor/libreoffice directory
-echo "Contents of vendor/libreoffice directory:"
-ls -l "$BUILD_DIR/vendor/libreoffice"
-
-# Set environment variables for LibreOffice
-echo "-----> LibreOffice: Setting PATH"
-
-PROFILE_PATH="$BUILD_DIR/.profile.d/libreoffice.sh"
-mkdir -p "$(dirname "$PROFILE_PATH")"
-
-# Add LibreOffice to the PATH
-echo 'export PATH="$HOME/vendor/libreoffice/opt/libreoffice${MINOR_VERSION}/program:$PATH"' >> "$PROFILE_PATH"
-
-echo "-----> LibreOffice installation completed."
+echo "-----> LibreOffice installation complete"
