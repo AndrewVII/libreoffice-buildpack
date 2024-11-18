@@ -1,4 +1,15 @@
    # custom-buildpack/bin/compile
    #!/bin/bash
-   echo "Setting LD_LIBRARY_PATH"
-   echo "export LD_LIBRARY_PATH=\"/usr/lib/libreoffice/program:\$LD_LIBRARY_PATH\"" >> $BUILD_DIR/.profile.d/set_ld_library_path.sh
+
+   # Check if BUILD_DIR is set
+   if [ -z "$BUILD_DIR" ]; then
+     echo "Error: BUILD_DIR is not set."
+     exit 1
+   fi
+
+   # Ensure the .profile.d directory exists
+   mkdir -p "$BUILD_DIR/.profile.d"
+
+   # Set LD_LIBRARY_PATH for LibreOffice
+   echo "Setting LD_LIBRARY_PATH for LibreOffice"
+   echo "export LD_LIBRARY_PATH=\"/usr/lib/libreoffice/program:\$LD_LIBRARY_PATH\"" >> "$BUILD_DIR/.profile.d/set_ld_library_path.sh"
