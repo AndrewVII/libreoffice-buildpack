@@ -6,7 +6,7 @@ CACHE_DIR=$2
 echo "-----> Installing LibreOffice"
 
 # URL for LibreOffice tarball (update this to the latest stable version if needed)
-LIBREOFFICE_URL="https://www.libreoffice.org/donate/dl/deb-x86_64/24.8.3/en-US/LibreOffice_24.8.3_Linux_x86-64_deb.tar.gz"
+LIBREOFFICE_URL="https://download.documentfoundation.org/libreoffice/stable/24.8.3/deb/x86_64/LibreOffice_24.8.3_Linux_x86-64_deb.tar.gz"
 
 # Download LibreOffice precompiled binary
 echo "-----> Downloading LibreOffice from $LIBREOFFICE_URL"
