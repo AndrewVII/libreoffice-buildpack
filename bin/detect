@@ -1,0 +1,3 @@
+#!/bin/bash
+echo "LibreOffice buildpack detected"
+exit 0
