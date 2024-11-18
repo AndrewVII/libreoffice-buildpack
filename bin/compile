@@ -7,12 +7,8 @@ echo "-----> Installing LibreOffice"
 
 # Add LibreOffice dependencies
 apt-get update
-apt-get install -y wget gnupg2
-
-# Download LibreOffice
-wget -qO- https://download.documentfoundation.org/libreoffice/stable/7.5.0/deb/x86_64/LibreOffice_7.5.0_Linux_x86-64_deb.tar.gz | tar xz -C /tmp
-
-# Install LibreOffice
-cp -r /tmp/LibreOffice*/DEBS/* $BUILD_DIR/
+apt-get install -y libreoffice
+apt-get install -y wget
+apt-get clean
 
 echo "-----> LibreOffice installation complete"
