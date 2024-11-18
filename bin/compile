@@ -5,10 +5,31 @@ CACHE_DIR=$2
 
 echo "-----> Installing LibreOffice"
 
-# Download LibreOffice precompiled binary
-wget -qO- https://download.documentfoundation.org/libreoffice/stable/7.5.0/deb/x86_64/LibreOffice_7.5.0_Linux_x86-64_deb.tar.gz | tar xz -C /tmp
+# URL for LibreOffice tarball (update this to the latest stable version if needed)
+LIBREOFFICE_URL="https://download.documentfoundation.org/libreoffice/stable/7.5.0/deb/x86_64/LibreOffice_7.5.0_Linux_x86-64_deb.tar.gz"
 
-# Copy the LibreOffice files to the build directory
+# Download LibreOffice precompiled binary
+echo "-----> Downloading LibreOffice from $LIBREOFFICE_URL"
+wget -q "$LIBREOFFICE_URL" -O /tmp/libreoffice.tar.gz
+
+# Check if the download was successful
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to download LibreOffice."
+  exit 1
+fi
+
+# Verify that the downloaded file is a valid tar.gz archive
+echo "-----> Extracting LibreOffice"
+tar -xvzf /tmp/libreoffice.tar.gz -C /tmp
+
+# Check if extraction was successful
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to extract LibreOffice."
+  exit 1
+fi
+
+# Copy the necessary LibreOffice files to the build directory
 cp -r /tmp/LibreOffice*/DEBS/* $BUILD_DIR/
 
+# Final message
 echo "-----> LibreOffice installation complete"
