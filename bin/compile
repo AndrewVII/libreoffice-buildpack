@@ -1,38 +1,43 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -e
 
 BUILD_DIR=$1
 CACHE_DIR=$2
 
-echo "-----> Installing LibreOffice"
+# config
+VERSION="24.8.3"
+MINOR_VERSION="24.8"
 
-# URL for LibreOffice tarball (update this to the latest stable version if needed)
-LIBREOFFICE_URL="https://download.documentfoundation.org/libreoffice/stable/24.8.3/deb/x86_64/LibreOffice_24.8.3_Linux_x86-64_deb.tar.gz"
+# LibreOffice Binaries URL
+FILE_NAME=libreoffice${VERSION}_x86-64.tar.gz
+BUILDPACK_LIBREOFFICE_PACKAGE=https://download.documentfoundation.org/libreoffice/stable/24.8.3/deb/x86_64/LibreOffice_24.8.3_Linux_x86-64_deb.tar.gz
+ARCHIVE_NAME=opt/libreoffice${VERSION}
 
-# Download LibreOffice precompiled binary using curl
-echo "-----> Downloading LibreOffice from $LIBREOFFICE_URL"
-curl -L "$LIBREOFFICE_URL" -o /tmp/libreoffice.tar.gz
+# Create cache directory if it doesn't exist
+mkdir -p $CACHE_DIR
 
-# Check if the download was successful
-if [ $? -ne 0 ]; then
-  echo "Error: Failed to download LibreOffice."
-  exit 1
+# Download LibreOffice binaries if they do not exist in the cache
+if ! [ -e $CACHE_DIR/$FILE_NAME ]; then
+  echo "-----> LibreOffice: Downloading LibreOffice ${VERSION} binaries from ${BUILDPACK_LIBREOFFICE_PACKAGE}"
+  curl -L $BUILDPACK_LIBREOFFICE_PACKAGE -o $CACHE_DIR/$FILE_NAME
 fi
 
-# Verify that the downloaded file is a valid tar.gz archive
-echo "-----> Extracting LibreOffice"
-tar -xvzf /tmp/libreoffice.tar.gz -C /tmp
+# Create necessary directories in the build path
+echo "-----> LibreOffice: Extracting LibreOffice ${VERSION} binaries to ${BUILD_DIR}/vendor/libreoffice"
+mkdir -p $BUILD_DIR/vendor/
 
-# Check if extraction was successful
-if [ $? -ne 0 ]; then
-  echo "Error: Failed to extract LibreOffice."
-  exit 1
-fi
+# Extract LibreOffice binaries to vendor/libreoffice
+tar xzf $CACHE_DIR/$FILE_NAME -C $BUILD_DIR/vendor/
+mv $BUILD_DIR/vendor/opt/libreoffice${VERSION} $BUILD_DIR/vendor/libreoffice
 
-# Copy the necessary LibreOffice files to the build directory
-cp -r /tmp/LibreOffice*/DEBS/* $BUILD_DIR/
+# Set environment variables for LibreOffice
+echo "-----> LibreOffice: Setting PATH"
 
-# Add LibreOffice binary path to the PATH environment variable
-export PATH=$PATH:/tmp/LibreOffice*/program
+PROFILE_PATH="$BUILD_DIR/.profile.d/libreoffice.sh"
+mkdir -p $(dirname $PROFILE_PATH)
 
-# Final message
-echo "-----> LibreOffice installation complete"
+# Add LibreOffice to the PATH
+echo 'export PATH="$HOME/vendor/libreoffice/program:$PATH"' >> $PROFILE_PATH
+
+echo "-----> LibreOffice installation completed."
