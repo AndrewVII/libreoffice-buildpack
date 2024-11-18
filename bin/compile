@@ -10,9 +10,9 @@ VERSION="24.8.3"
 MINOR_VERSION="24.8"
 
 # LibreOffice Binaries URL
-FILE_NAME=libreoffice${VERSION}_x86-64.tar.gz
-BUILDPACK_LIBREOFFICE_PACKAGE=https://download.documentfoundation.org/libreoffice/stable/24.8.3/deb/x86_64/LibreOffice_24.8.3_Linux_x86-64_deb.tar.gz
-ARCHIVE_NAME=opt/libreoffice${VERSION}
+FILE_NAME=LibreOffice_${VERSION}_Linux_x86-64_deb.tar.gz
+BUILDPACK_LIBREOFFICE_PACKAGE=https://download.documentfoundation.org/libreoffice/stable/${VERSION}/deb/x86_64/${FILE_NAME}
+ARCHIVE_NAME=libreoffice_${VERSION}
 
 # Create cache directory if it doesn't exist
 mkdir -p $CACHE_DIR
@@ -29,7 +29,16 @@ mkdir -p $BUILD_DIR/vendor/
 
 # Extract LibreOffice binaries to vendor/libreoffice
 tar xzf $CACHE_DIR/$FILE_NAME -C $BUILD_DIR/vendor/
-mv $BUILD_DIR/vendor/opt/libreoffice${VERSION} $BUILD_DIR/vendor/libreoffice
+
+# We expect that the tarball extracts to a folder like "LibreOffice_24.8.3_Linux_x86-64_deb"
+# Let's move the contents of that folder into the desired vendor directory
+LIBREOFFICE_EXTRACTED_DIR=$(find $BUILD_DIR/vendor/ -maxdepth 1 -type d -name 'LibreOffice_*')
+if [ -z "$LIBREOFFICE_EXTRACTED_DIR" ]; then
+  echo "Error: LibreOffice extraction directory not found."
+  exit 1
+fi
+
+mv $LIBREOFFICE_EXTRACTED_DIR/* $BUILD_DIR/vendor/libreoffice
 
 # Set environment variables for LibreOffice
 echo "-----> LibreOffice: Setting PATH"
